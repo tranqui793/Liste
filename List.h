@@ -118,13 +118,13 @@ public:
          *
          * @return
          */
-        const Iterator operator++(int);
+        Iterator operator++(int);
 
         /*!
          *
          * @return
          */
-        const Iterator operator--(int);
+        Iterator operator--(int);
 
     };
 
@@ -286,12 +286,55 @@ public:
     ConstIterator constEnd();
 
 private:
+    /*!
+     * pour factoriser le code
+     */
+    /*!
+     * creer une liste vide
+     */
     void initList();
-    void deleteElement(Iterator& it){
+    /*!
+     *
+     * @param it Iterator de l'element a supprimer
+     */
+    void deleteElement(Iterator &it) {
 
         it->prev->next = it->next;
         it->next->prev = it->prev;
         delete it.operator->();
+    }
+    /*!
+     * creer une liste depuis une autre liste
+     * @param otherList
+     */
+    void createNewListFromOtherList(const List<T> &otherList) {
+        initList();
+        for (auto it = otherList.constBegin(); it != otherList.constEnd(); ++it) {
+            append(*it);
+        }
+    }
+    /*!
+     * creer une liste depuis une liste initializer
+     * @param args
+     */
+    void createNewListFromInitilizer(const std::initializer_list<T> &args){
+        initList();
+        for (auto it = args.begin(); it != args.end(); ++it) {
+            append(*it);
+        }
+    }
+    /*!
+     * supprime tt les elements de la liste
+     */
+    void clearList() {
+        for (List<T>::Iterator it = begin(); it != end(); ++it) {
+            delete it.operator->();
+        }
+
+        delete _head;
+        delete _tail;
+
+        _size = 0;
     }
 };
 
@@ -311,18 +354,12 @@ void List<T>::initList() {
 
 template<typename T>
 List<T>::List(const std::initializer_list<T> &args) {
-    initList();
-    for (auto it = args.begin(); it != args.end(); ++it) {
-        append(*it);
-    }
+    createNewListFromInitilizer(args);
 }
 
 template<typename T>
 List<T>::List(const List<T> &otherList) {
-    initList();
-    for (auto it = otherList.constBegin(); it != otherList.constEnd(); ++it) {
-        append(*it);
-    }
+    createNewListFromOtherList(otherList);
 }
 
 template<typename T>
@@ -363,18 +400,20 @@ void List<T>::remove(const T &ele) {
         }
     }
 }
-template <typename T>
+
+template<typename T>
 void List<T>::removeAt(const size_t pos) {
-    if(pos>=_size){
+    if (pos >= _size) {
         throw std::out_of_range("out of bounds");
     }
-    Iterator it=begin();
+    Iterator it = begin();
     for (size_t i = 0; i < pos; ++i) {
         ++it;
     }
     deleteElement(it);
 }
-template <typename T>
+
+template<typename T>
 int List<T>::find(const T &ele) {
     int index = 0;
 
@@ -389,4 +428,35 @@ int List<T>::find(const T &ele) {
     return -1;
 }
 
+template<typename T>
+typename List<T>::Iterator List<T>::begin() {
+    return Iterator(_head->next);
+}
+
+template<typename T>
+typename List<T>::Iterator List<T>::end() {
+    return Iterator(_tail);
+}
+
+template<typename T>
+typename List<T>::ConstIterator List<T>::constBegin() {
+    return ConstIterator(_head->next);
+}
+
+template<typename T>
+typename List<T>::ConstIterator List<T>::constEnd() {
+    return ConstIterator(_tail);
+}
+template <typename T>
+List<T>& List<T>::operator=(const std::initializer_list<T> &args) {
+    clearList();
+    createNewListFromInitilizer(args);
+    return *this;
+}
+template <typename T>
+List<T>& List<T>::operator=(const List<T>& otherList) {
+    clearList();
+    createNewListFromOtherList(otherList);
+    return *this;
+}
 #endif //LISTE_LIST_H
