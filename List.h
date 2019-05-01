@@ -70,6 +70,10 @@ private:
 
         bool operator!=(const AbstractIterator &it) const;
 
+        void setNextElem();
+
+        void setPreviousElem();
+
     protected:
         Node *element;
 
@@ -146,13 +150,13 @@ public:
          *
          * @return
          */
-        const T &operator*();
+        const T &operator*() const;
 
         /*!
          *
          * @return
          */
-        const Node *operator->();
+        const Node *operator->() const;
 
         /*!
          *
@@ -170,13 +174,13 @@ public:
          *
          * @return
          */
-        const ConstIterator operator++(int);
+        ConstIterator operator++(int);
 
         /*!
          *
          * @return
          */
-        const ConstIterator operator--(int);
+        ConstIterator operator--(int);
     };
 
     /*!
@@ -285,6 +289,8 @@ public:
      */
     ConstIterator constEnd();
 
+    ~List();
+
 private:
     /*!
      * pour factoriser le code
@@ -293,6 +299,9 @@ private:
      * creer une liste vide
      */
     void initList();
+
+    T &getElem(size_t index) const;
+
     /*!
      *
      * @param it Iterator de l'element a supprimer
@@ -303,6 +312,7 @@ private:
         it->next->prev = it->prev;
         delete it.operator->();
     }
+
     /*!
      * creer une liste depuis une autre liste
      * @param otherList
@@ -313,16 +323,18 @@ private:
             append(*it);
         }
     }
+
     /*!
      * creer une liste depuis une liste initializer
      * @param args
      */
-    void createNewListFromInitilizer(const std::initializer_list<T> &args){
+    void createNewListFromInitilizer(const std::initializer_list<T> &args) {
         initList();
         for (auto it = args.begin(); it != args.end(); ++it) {
             append(*it);
         }
     }
+
     /*!
      * supprime tt les elements de la liste
      */
@@ -380,6 +392,11 @@ void List<T>::append(const T &ele) {
         aux->next = _tail;
     }
     _size++;
+}
+
+template<typename T>
+List<T>::~List() {
+    clearList();
 }
 
 template<typename T>
@@ -447,16 +464,158 @@ template<typename T>
 typename List<T>::ConstIterator List<T>::constEnd() {
     return ConstIterator(_tail);
 }
-template <typename T>
-List<T>& List<T>::operator=(const std::initializer_list<T> &args) {
+
+template<typename T>
+List<T> &List<T>::operator=(const std::initializer_list<T> &args) {
     clearList();
     createNewListFromInitilizer(args);
     return *this;
 }
-template <typename T>
-List<T>& List<T>::operator=(const List<T>& otherList) {
+
+template<typename T>
+List<T> &List<T>::operator=(const List<T> &otherList) {
     clearList();
     createNewListFromOtherList(otherList);
     return *this;
 }
+
+template<typename T>
+T List<T>::operator[](const size_t index) const {
+    return getElem(index);
+}
+
+template<typename T>
+T &List<T>::operator[](const size_t index) {
+    return getElem(index);
+}
+
+template<typename T>
+T &List<T>::getElem(size_t index) const {
+    if (index >= _size) {
+        throw std::out_of_range("out of bounds");
+    }
+
+    Iterator it = constBegin();
+
+    for (size_t i = 0; i < index; ++i) {
+        ++it;
+    }
+
+    return *it;
+}
+
+template<typename T>
+typename List<T>::Node *List<T>::Iterator::operator->() {
+    return AbstractIterator::element;
+}
+
+template<typename T>
+T &List<T>::Iterator::operator*() {
+    return AbstractIterator::element->data;
+}
+
+template<typename T>
+typename List<T>::Iterator &List<T>::Iterator::operator++() {
+    AbstractIterator::setNextElem();
+    return *this;
+}
+
+template<typename T>
+typename List<T>::Iterator List<T>::Iterator::operator++(int) {
+    Iterator temp(*this);
+    operator++();
+    return temp;
+}
+
+template<typename T>
+typename List<T>::Iterator &List<T>::Iterator::operator--() {
+    AbstractIterator::setPreviousElem();
+    return *this;
+}
+
+template<typename T>
+typename List<T>::Iterator List<T>::Iterator::operator--(int) {
+    Iterator temp(*this);
+    operator--();
+    return temp;
+}
+
+template<typename T>
+const T &List<T>::ConstIterator::operator*() const {
+    return AbstractIterator::element->data;
+}
+
+template<typename T>
+const typename List<T>::Node *List<T>::ConstIterator::operator->() const {
+    return AbstractIterator::element;
+}
+
+template<typename T>
+typename List<T>::ConstIterator &List<T>::ConstIterator::operator++() {
+    AbstractIterator::setNextElem();
+    return *this;
+}
+
+template<typename T>
+typename List<T>::ConstIterator List<T>::ConstIterator::operator++(int) {
+    ConstIterator temp(*this);
+    operator++();
+    return temp;
+}
+
+template<typename T>
+typename List<T>::ConstIterator &List<T>::ConstIterator::operator--() {
+    AbstractIterator::setPreviousElem();
+    return *this;
+}
+
+template<typename T>
+typename List<T>::ConstIterator List<T>::ConstIterator::operator--(int) {
+    ConstIterator temp(*this);
+    operator--();
+    return temp;
+}
+
+template<typename T>
+List<T>::AbstractIterator::AbstractIterator(Node *element) : element(element) {}
+
+template<typename T>
+List<T>::AbstractIterator::AbstractIterator(const AbstractIterator &it) : element(it.element) {}
+
+template<typename T>
+typename List<T>::AbstractIterator &List<T>::AbstractIterator::operator=(const AbstractIterator &it) {
+    if (&it != this) {
+        this->element = it.element;
+    }
+    return *this;
+}
+
+template<typename T>
+bool List<T>::AbstractIterator::operator==(const AbstractIterator &it) const {
+    return it.element == element;
+}
+
+template<typename T>
+bool List<T>::AbstractIterator::operator!=(const AbstractIterator &it) const {
+    return it != *this;
+}
+
+template<typename T>
+void List<T>::AbstractIterator::setNextElem() {
+    if (AbstractIterator::element != nullptr) {
+        AbstractIterator::element = AbstractIterator::element->next;
+    } else {
+        throw std::out_of_range("out of range");
+    }
+}
+
+template<typename T>
+void List<T>::AbstractIterator::setPreviousElem() {
+    if (AbstractIterator::element != nullptr) {
+        AbstractIterator::element = AbstractIterator::element->previous;
+    } else {
+        throw std::out_of_range("out of range");
+    }
+}
+
 #endif //LISTE_LIST_H
