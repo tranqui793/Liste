@@ -19,11 +19,10 @@ public:
     std::string getName();
     
 public:
-    std::string _name;
+    std::string _name ;
 };
 
 Person::Person(std::string name) : _name(name){
-    
 }
 
 std::string Person::getName() {
@@ -40,8 +39,6 @@ int main() {
     list.append(3);
     list.append(4);
     cout << "list: " << list << endl;
-//    int r1 = list.removeAt(0);
-//    int r2 = list.removeAt(1);
     cout << "list: " << list << endl;
     list.insert(9);
     list.insert(8);
@@ -90,6 +87,9 @@ int main() {
     
     
     
+    
+    
+    
     std::cout << std::endl << "Creating all the lists and objects..." << std::endl;
     List<std::string> l1;
     List<int> l2;
@@ -98,10 +98,10 @@ int main() {
     List<char>* l5 = new List<char>;
     
     List<Person*> people;
-    Person* person1 = new Person("Ludovic");
+    Person* person1 = new Person("Jean");
     Person* person2 = new Person("Kevin");
-    Person* person3 = new Person("Gérard");
-    
+    Person* person3 = new Person("Gerard");
+
     std::cout << std::endl << "Testing all kind of operations..." << std::endl;
     
     std::cout << "l1: ";
@@ -204,8 +204,6 @@ int main() {
 
     
 
-    
-    
     
     return EXIT_SUCCESS;
 }

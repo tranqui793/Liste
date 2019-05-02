@@ -74,9 +74,9 @@ private:
         
         /*!
          * opérateur d'accès aux propriétés
-         * @return un pointeur sur le node courant
+         * @return un pointeur sur la data du node courant
          */
-        Node* operator->() const;
+        T* operator->() const;
 
         /*!
          * opérateur d'incrémentation
@@ -99,6 +99,10 @@ private:
          * @return un booléen
          */
         bool hasPrev () const;
+        
+        friend class List;
+//        friend void List::clearList();
+//        friend void List::deleteElement(List<T>::Iterator);
         
 
     protected:
@@ -171,7 +175,7 @@ public:
          *
          * @return
          */
-        const Node* operator->() const;
+        const T* operator->() const;
 
         /*!
          *
@@ -320,6 +324,7 @@ private:
     /*!
      * pour factoriser le code
      */
+    
     /*!
      * crée une liste vide
      */
@@ -334,25 +339,25 @@ private:
     void deleteElement(Iterator &it) {
 
 
-        Node * elt = it.operator->();
+        Node * elt = it.element;
         if ( elt != nullptr) {
             
             if (elt->next) {
                 // pas le dernier element
-                it->next->prev = it->prev;
+                it.element->next->prev = it.element->prev;
             }
             else {
                 _tail = elt->prev;
             }
             if (elt->prev) {
                 // pas le premier element
-                it->prev->next = it->next;
+                it.element->prev->next = it.element->next;
             }
             else {
                 _head = elt->next;
             }
             
-            delete it.operator->();
+            delete it.element;
         }
     }
 
@@ -364,7 +369,7 @@ private:
         initList();
         ConstIterator it = otherList.constBegin();
         do {
-            append(it->data);
+            append(*it);
         } while (it++ != otherList.constEnd());
     }
 
@@ -390,7 +395,7 @@ private:
             for (List<T>::Iterator it = begin(); it != end(); ) {
                 ++it;
                 delete tmp;
-                tmp = it.operator->();
+                tmp = it.element;
             }
             _head = _tail = nullptr;
             _size = 0;
@@ -562,8 +567,8 @@ T &List<T>::getElem(size_t index) const {
 
 
 template<typename T>
-typename List<T>::Node* List<T>::AbstractIterator::operator->() const {
-    return element;
+T* List<T>::AbstractIterator::operator->() const {
+    return &element->data;
 }
 
 template<typename T>
@@ -603,8 +608,8 @@ const T& List<T>::ConstIterator::operator*() const {
 }
 
 template<typename T>
-const typename List<T>::Node* List<T>::ConstIterator::operator->() const {
-    return AbstractIterator::element;
+const T* List<T>::ConstIterator::operator->() const {
+    return &AbstractIterator::element->data;
 }
 
 template<typename T>
@@ -682,8 +687,8 @@ typename List<T>::Node* List<T>::AbstractIterator::operator++() {
 
 template<typename T>
 typename List<T>::Node* List<T>::AbstractIterator::operator--() {
-    if (AbstractIterator::element != nullptr) {
-        AbstractIterator::element = AbstractIterator::element->prev;
+    if (element != nullptr) {
+        element = element->prev;
     } else {
         throw std::out_of_range("out of range");
     }
