@@ -31,59 +31,73 @@ private:
     class AbstractIterator {
     public:
         /*!
-         *
+         * Constructeur à partir d'un node
          * @param element
          */
         AbstractIterator(Node *element = nullptr);
 
         /*!
-         *
+         * Constructeur à partir d'un autre itérateur
          * @param it
          */
         AbstractIterator(const AbstractIterator &it);
 
         /*!
-         *
+         * opérateur d'affectation
          * @param it
-         * @return
+         * @return une référence sur l'itérateur
          */
         AbstractIterator &operator=(const AbstractIterator &it);
 
 
         /*!
-         *
+         * opérateur de comparaison
          * @param it
-         * @return
+         * @return true si les itérateurs pointent sur le même node, false sinon
          */
 
         bool operator== (const AbstractIterator &it) const;
 
         /*!
-         *
+         * opérateur distinct
          * @param it
-         * @return
+         * @return false si les itérateurs pointent sur le même node, true sinon
          */
 
         bool operator!= (const AbstractIterator &it) const;
         
         /*!
-         *
-         * @return
+         * opérateur de déréférencement
+         * @return l'élément de la liste sur lequel pointe l'itérateur
          */
         T& operator* () const;
         
         /*!
-         *
-         * @return
+         * opérateur d'accès aux propriétés
+         * @return un pointeur sur le node courant
          */
         Node* operator->() const;
 
-        void operator++();
+        /*!
+         * opérateur d'incrémentation
+         */
+        Node* operator++();
 
-        void operator--();
+        /*!
+         * opérateur de décrémentation
+         */
+        Node* operator--();
         
+        /*!
+         * indique si le node courant a un élément suivant
+         * @return un booléen
+         */
         bool hasNext () const;
         
+        /*!
+         * indique si le node courant a un élément suivant
+         * @return un booléen
+         */
         bool hasPrev () const;
         
 
@@ -348,9 +362,10 @@ private:
      */
     void createNewListFromOtherList(const List<T> &otherList) {
         initList();
-        for (auto it = otherList.constBegin(); it != otherList.constEnd(); ++it) {
+        ConstIterator it = otherList.constBegin();
+        do {
             append(it->data);
-        }
+        } while (it++ != otherList.constEnd());
     }
 
     /*!
@@ -469,13 +484,12 @@ template<typename T>
 int List<T>::find(const T &ele) {
     int index = 0;
 
-    for (ConstIterator it = constBegin(); it != constEnd(); ++it) {
-        if (*it == ele) {
+    ConstIterator it = constBegin();
+    do {
+        if (*it == ele)
             return index;
-        }
-
         ++index;
-    }
+    } while ( it++ != constEnd());
 
     return -1;
 }
@@ -492,7 +506,7 @@ typename List<T>::Iterator List<T>::end() const {
 
 template<typename T>
 typename List<T>::ConstIterator List<T>::constBegin() const {
-    return ConstIterator(_head->next);
+    return ConstIterator(_head);
 }
 
 template<typename T>
@@ -657,21 +671,23 @@ bool List<T>::AbstractIterator::hasPrev () const {
 
 
 template<typename T>
-void List<T>::AbstractIterator::operator++() {
+typename List<T>::Node* List<T>::AbstractIterator::operator++() {
     if (element != nullptr) {
         element = element->next;
     } else {
         throw std::out_of_range("out of range");
     }
+    return element;
 }
 
 template<typename T>
-void List<T>::AbstractIterator::operator--() {
+typename List<T>::Node* List<T>::AbstractIterator::operator--() {
     if (AbstractIterator::element != nullptr) {
         AbstractIterator::element = AbstractIterator::element->prev;
     } else {
         throw std::out_of_range("out of range");
     }
+    return element;
 }
 
 

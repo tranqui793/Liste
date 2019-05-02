@@ -50,35 +50,37 @@ int main() {
     List<int> list2(list);
     cout << "list2: " << list2 << endl;
     List<int>::Iterator it = list2.begin();
-    while(it.hasNext())
-        cout << *it++ << " ";
+    do
+        cout << *it << " ";
+    while(it++.hasNext());
     cout << endl;
-    cout << "test ->data : " << it->data << endl;
-    
     
     List<int> list3;
     list3.append(1);
     list3.insert(2);
     list3.append(3);
-    cout << list3 << endl;
+    cout << "list3: " << list3 << endl;
     
     
-    const List<int> b = { 42, 3, 14 ,35,22};
-    cout << b << endl;
+    const List<int> listFromInit = { 42, 3, 14 ,35,22};
+    cout << "listFromInit: " << listFromInit << endl;
     
-    List<string> l;
-    l.append("un");
-    l.append("deux");
-    l.append("trois");
-    for (List<string>::Iterator it = l.begin(); it != l.end(); ++it)
-        cout << *it << " ";
-    cout << endl;
+    List<string> listString;
+    listString.append("un");
+    listString.append("deux");
+    listString.append("trois");
+//    for (List<string>::Iterator it = listString.begin(); it != listString.end(); ++it)
+        cout << "listString: " << listString << endl;
+
     // Affichage: un deux trois
     
     const List<int> c = { 42, 3, 14 };
-        for (List<int>::ConstIterator it = --c.end(); it != --c.begin(); --it)
-            cout << *it << " ";
-        cout << endl;
+    it = c.end();
+    cout << "reverse printing: ";
+    do
+        cout << *it << " ";
+    while ( it-- != c.begin());
+    cout << endl;
     // Affichage: 14 3 42
     
     
@@ -103,7 +105,7 @@ int main() {
     std::cout << std::endl << "Testing all kind of operations..." << std::endl;
     
     std::cout << "l1: ";
-    for (List<std::string>::ConstIterator it = l1.begin(); it != l1.end(); ++it) {
+    for (List<std::string>::ConstIterator it = l1.constBegin(); it != l1.constEnd(); ++it) {
         std::cout << *it << " ";
     }
     std::cout << std::endl;
@@ -114,7 +116,7 @@ int main() {
     l1.insert("ceci");
     std::cout << "l1: " << l1 << std::endl;
     
-    std::cout << "'ceci' se trouve à la position " << l1.find("ceci")
+    std::cout << "'test' se trouve à la position " << l1.find("test")
     << " de la liste l1." << std::endl;
     
     std::cout << "'reussite' se trouve à la position " << l1.find("reussite")
@@ -159,12 +161,12 @@ int main() {
     
     std::cout << "People: " << people << std::endl;
     
-    for (List<int>::ConstIterator it = l4.begin(); it != l4.end(); ++it) {
+    for (List<int>::ConstIterator it = l4.constBegin(); it != l4.constEnd(); ++it) {
         std::cout << *it << " ";
     }
     std::cout << std::endl;
     
-    for (List<int>::ConstIterator it = --l4.end(); it != --l4.begin(); it--) {
+    for (List<int>::ConstIterator it = --l4.constEnd(); it != --l4.constBegin(); it--) {
         std::cout << *it << " ";
     }
     std::cout << std::endl;
@@ -198,6 +200,8 @@ int main() {
     delete person1;
     delete person2;
     delete person3;
+    
+
     
 
     
